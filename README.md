@@ -198,3 +198,163 @@ iface eth0 inet static
       netmask 255.255.255.248
       gateway 192.196.7.129
 ```
+
+## Routing
+Ostania
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.149
+```
+
+Westalis
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.145
+```
+
+Strix
+```
+route add -net  192.196.7.128 netmask 255.255.255.248 gw 192.196.7.146
+route add -net  192.196.7.0 netmask 255.255.255.128 gw 192.196.7.146
+route add -net  192.196.0.0 netmask 255.255.252.0 gw 192.196.7.146
+route add -net  192.196.7.144 netmask 255.255.255.252 gw 192.196.7.146
+
+route add -net  192.196.7.148 netmask 255.255.255.252 gw 192.196.7.150
+route add -net  192.196.6.0 netmask 255.255.255.0 gw 192.196.7.150
+route add -net  192.196.4.0 netmask 255.255.254.0 gw 192.196.7.150
+route add -net  192.196.7.136 netmask 255.255.255.248 gw 192.196.7.150
+```
+
+## Konfigurasi DNS Server, Web server, DHCP Server, dan DHCP relay
+1. Eden sebagai DNS Server
+
+Buat file bernama named.conf.options dan isi kode berikut.
+```
+options {
+        directory "/var/cache/bind";
+        forwarders {
+                192.168.122.1;
+        };
+        allow-query { any; };
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+```
+
+Kemudian, jalankan perintah berikut.
+```
+apt update
+apt install bind9 -y
+cp named.conf.options /etc/bind/named.conf.options
+service bind9 restart
+```
+
+2. WISE sebagai DHCP Server
+
+Buat file bernama dhcpd.conf dan isi kode berikut.
+```
+ddns-update-style none;
+option domain-name "example.org";
+option domain-name-servers ns1.example.org, ns2.example.org;
+default-lease-time 600;
+max-lease-time 7200;
+log-facility local7;
+subnet 192.196.0.0 netmask 255.255.252.0 {
+range 192.196.0.2 192.196.3.254;
+option routers 192.196.0.1;
+option broadcast-address 192.196.3.255;
+option domain-name-servers 192.196.7.131;
+default-lease-time 360;
+max-lease-time 7200;
+}
+subnet 192.196.7.0 netmask 255.255.255.128 {
+range 192.196.7.2 192.196.7.126;
+option routers 192.196.7.1;
+option broadcast-address 192.196.7.127;
+option domain-name-servers 192.196.7.131;
+default-lease-time 720;
+max-lease-time 7200;
+}
+subnet 192.196.4.0 netmask 255.255.254.0 {
+range 192.196.4.2 192.196.5.254;
+option routers 192.196.4.1;
+option broadcast-address 192.196.5.255;
+option domain-name-servers 192.196.7.131;
+default-lease-time 720;
+max-lease-time 7200;
+}
+subnet 192.196.6.0 netmask 255.255.255.0 {
+range 192.196.6.2 192.196.6.254;
+option routers 192.196.6.1;
+option broadcast-address 192.196.6.255;
+option domain-name-servers 192.196.7.131;
+default-lease-time 720;
+max-lease-time 7200;
+}
+subnet 192.196.7.128 netmask 255.255.255.248 {}
+subnet 192.196.7.144 netmask 255.255.255.252 {}
+subnet 192.196.7.148 netmask 255.255.255.252 {}
+subnet 192.196.7.136 netmask 255.255.255.248 {}
+```
+
+Selanjutnya, buat juga file bernama isc-dhcp-server dan isi kode berikut.
+```
+INTERFACES="eth0"
+```
+
+Kemudian, jalankan perintah berikut.
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install isc-dhcp-server -y
+cp isc-dhcp-server /etc/default/isc-dhcp-server
+cp dhcpd.conf /etc/dhcp/dhcpd.conf
+service isc-dhcp-server restart
+```
+
+3. Ostania sebagai DHCP Relay
+
+Jalankan perintah berikut.
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install isc-dhcp-relay -y
+echo '
+SERVERS="192.196.7.130"
+INTERFACES="eth2 eth3 eth0 eth1"
+OPTIONS=""
+' > /etc/default/isc-dhcp-relay
+service isc-dhcp-relay restart
+```
+
+4. Westalis sebagai DHCP Relay
+
+Jalankan perintah berikut.
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install isc-dhcp-relay -y
+echo '
+SERVERS="192.196.7.130"
+INTERFACES="eth2 eth3 eth1 eth0"
+OPTIONS=""
+' > /etc/default/isc-dhcp-relay
+service isc-dhcp-relay restart
+```
+
+5. Garden sebagai Web Server
+
+Jalankan perintah berikut.
+```
+apt update
+apt install apache2 -y
+service apache2 start
+echo "$HOSTNAME" > /var/www/html/index.html
+```
+
+6. SSS sebagai Web Server
+
+Jalankan perintah berikut.
+```
+apt update
+apt install apache2 -y
+service apache2 start
+echo "$HOSTNAME" > /var/www/html/index.html
+```
