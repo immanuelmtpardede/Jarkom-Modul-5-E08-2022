@@ -9,7 +9,7 @@ Laporan Resmi Praktikum V Jaringan Komputer oleh Kelompok E08
 | 2. | Muhammad Ismail | 5025201223 |
 | 3. | Immanuel Maruli Tua Pardede | 5025201166 |
 
-## Soal
+## Soal Pengantar
 Setelah kalian mempelajari semua modul yang telah diberikan, Loid ingin meminta bantuan untuk terakhir kalinya kepada kalian. Dan kalian dengan senang hati mau membantu Loid.
 
 (A) Tugas pertama kalian yaitu membuat topologi jaringan sesuai dengan rancangan yang diberikan Loid dibawah ini:
@@ -33,18 +33,8 @@ Keterangan:
 
 (D) Tugas berikutnya adalah memberikan ip pada subnet Forger, Desmond, Blackbell, dan Briar secara dinamis menggunakan bantuan DHCP server. Kemudian kalian ingat bahwa kalian harus setting DHCP Relay pada router yang menghubungkannya.
 
-<ol>
-<li>Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Strix menggunakan iptables, tetapi Loid tidak ingin menggunakan MASQUERADE.</li>
-<li>Kalian diminta untuk melakukan drop semua TCP dan UDP dari luar Topologi kalian pada server yang merupakan DHCP Server demi menjaga keamanan.</li>
-<li>Loid meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 2 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.</li>
-<li>Akses menuju Web Server hanya diperbolehkan disaat jam kerja yaitu Senin sampai Jumat pada pukul 07.00 - 16.00.</li>
-<li>Karena kita memiliki 2 Web Server, Loid ingin Ostania diatur sehingga setiap request dari client yang mengakses Garden dengan port 80 akan didistribusikan secara bergantian pada SSS dan Garden secara berurutan dan request dari client yang mengakses SSS dengan port 443 akan didistribusikan secara bergantian pada Garden dan SSS secara berurutan.</li>
-<li>Karena Loid ingin tau paket apa saja yang di-drop, maka di setiap node server dan router ditambahkan logging paket yang di-drop dengan standard syslog level.</li>
-</ol>
-
-Loid berterima kasih pada kalian karena telah membantunya. Loid juga mengingatkan agar semua aturan iptables harus disimpan pada sistem atau paling tidak kalian menyediakan script sebagai backup.
-
-## Jawaban
+## Jawaban Pengantar
+### Topologi dan Perhitungan
 Berikut merupakan topologi pada GNS3 dan pembagian subnetnya.
 
 <img src="https://github.com/immanuelmtpardede/Jarkom-Modul-5-E08-2022/blob/main/img/A.png" width="50%">
@@ -53,8 +43,27 @@ Beikut merupakan perhitungan konfigurasinya.
 
 <img src="https://github.com/immanuelmtpardede/Jarkom-Modul-5-E08-2022/blob/main/img/B.png" width="50%">
 
-## Konfigurasi Network Setiap Node
-Ostania
+### Konfigurasi Network Setiap Node
+1. Strix
+```
+auto lo
+iface lo inet loopback
+
+auto eth1
+iface eth1 inet dhcp
+
+auto eth0
+iface eth0 inet static
+address 192.196.7.145
+netmask 255.255.255.252
+
+auto eth2
+iface eth2 inet static
+address 192.196.7.149
+netmask 255.255.255.252
+```
+
+2. Ostania
 ```
 auto lo
 iface lo inet loopback
@@ -81,7 +90,7 @@ iface eth3 inet static
       netmask 255.255.255.248
 ```
 
-Westalis
+3. Westalis
 ```
 auto lo
 iface lo inet loopback
@@ -108,26 +117,7 @@ iface eth3 inet static
       gateway 192.196.7.145
 ```
 
-Strix
-```
-auto lo
-iface lo inet loopback
-
-auto eth1
-iface eth1 inet dhcp
-
-auto eth0
-iface eth0 inet static
-address 192.196.7.145
-netmask 255.255.255.252
-
-auto eth2
-iface eth2 inet static
-address 192.196.7.149
-netmask 255.255.255.252
-```
-
-Blackbell
+4. Blackbell
 ```
 auto lo
 iface lo inet loopback
@@ -136,7 +126,7 @@ auto eth0
 iface eth0 inet dhcp
 ```
 
-Briar
+5. Briar
 ```
 auto lo
 iface lo inet loopback
@@ -145,7 +135,7 @@ auto eth0
 iface eth0 inet dhcp
 ```
 
-Desmond
+6. Desmond
 ```
 auto lo
 iface lo inet loopback
@@ -154,7 +144,7 @@ auto eth0
 iface eth0 inet dhcp
 ```
 
-Forger
+7. Forger
 ```
 auto lo
 iface lo inet loopback
@@ -163,7 +153,7 @@ auto eth0
 iface eth0 inet dhcp
 ```
 
-Garden
+8. Garden
 ```
 auto eth0
 iface eth0 inet static
@@ -172,7 +162,7 @@ iface eth0 inet static
       gateway 192.196.7.141
 ```
 
-Eden
+9. Eden
 ```
 auto eth0
 iface eth0 inet static
@@ -181,7 +171,7 @@ iface eth0 inet static
       gateway 192.196.7.129
 ```
 
-SSS
+10. SSS
 ```
 auto eth0
 iface eth0 inet static
@@ -190,7 +180,7 @@ iface eth0 inet static
       gateway 192.196.7.141
 ```
 
-WISE
+11. WISE
 ```
 auto eth0
 iface eth0 inet static
@@ -199,18 +189,8 @@ iface eth0 inet static
       gateway 192.196.7.129
 ```
 
-## Routing
-Ostania
-```
-route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.149
-```
-
-Westalis
-```
-route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.145
-```
-
-Strix
+### Routing
+1. Strix
 ```
 route add -net  192.196.7.128 netmask 255.255.255.248 gw 192.196.7.146
 route add -net  192.196.7.0 netmask 255.255.255.128 gw 192.196.7.146
@@ -223,7 +203,17 @@ route add -net  192.196.4.0 netmask 255.255.254.0 gw 192.196.7.150
 route add -net  192.196.7.136 netmask 255.255.255.248 gw 192.196.7.150
 ```
 
-## Konfigurasi DNS Server, Web server, DHCP Server, dan DHCP relay
+2. Ostania
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.149
+```
+
+3. Westalis
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.196.7.145
+```
+
+### Konfigurasi DNS Server, Web server, DHCP Server, dan DHCP relay
 1. Eden sebagai DNS Server
 
 Buat file bernama named.conf.options dan isi kode berikut.
@@ -358,3 +348,13 @@ apt install apache2 -y
 service apache2 start
 echo "$HOSTNAME" > /var/www/html/index.html
 ```
+
+## Soal dan Jawaban Modul
+1. Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Strix menggunakan iptables, tetapi Loid tidak ingin menggunakan MASQUERADE.
+2. Kalian diminta untuk melakukan drop semua TCP dan UDP dari luar Topologi kalian pada server yang merupakan DHCP Server demi menjaga keamanan.
+3. Loid meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 2 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.
+4. Akses menuju Web Server hanya diperbolehkan disaat jam kerja yaitu Senin sampai Jumat pada pukul 07.00 - 16.00.
+5. Karena kita memiliki 2 Web Server, Loid ingin Ostania diatur sehingga setiap request dari client yang mengakses Garden dengan port 80 akan didistribusikan secara bergantian pada SSS dan Garden secara berurutan dan request dari client yang mengakses SSS dengan port 443 akan didistribusikan secara bergantian pada Garden dan SSS secara berurutan.
+6. Karena Loid ingin tau paket apa saja yang di-drop, maka di setiap node server dan router ditambahkan logging paket yang di-drop dengan standard syslog level.
+
+Loid berterima kasih pada kalian karena telah membantunya. Loid juga mengingatkan agar semua aturan iptables harus disimpan pada sistem atau paling tidak kalian menyediakan script sebagai backup.
