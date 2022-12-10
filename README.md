@@ -43,3 +43,158 @@ Keterangan:
 </ol>
 
 Loid berterima kasih pada kalian karena telah membantunya. Loid juga mengingatkan agar semua aturan iptables harus disimpan pada sistem atau paling tidak kalian menyediakan script sebagai backup.
+
+## Jawaban
+Berikut merupakan topologi pada GNS3 dan pembagian subnetnya.
+
+<img src="https://github.com/immanuelmtpardede/Jarkom-Modul-5-E08-2022/blob/main/img/A.png" width="50%">
+
+Beikut merupakan perhitungan konfigurasinya.
+
+<img src="https://github.com/immanuelmtpardede/Jarkom-Modul-5-E08-2022/blob/main/img/B.png" width="50%">
+
+## Konfigurasi Network Setiap Node
+Ostania
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+      address 192.196.7.150
+      netmask 255.255.255.252
+      gateway 192.196.7.149
+
+auto eth1
+iface eth1 inet static
+      address 192.196.4.1
+      netmask 255.255.254.0
+
+auto eth2
+iface eth2 inet static
+      address 192.196.6.1
+      netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+      address 192.196.7.141
+      netmask 255.255.255.248
+```
+
+Westalis
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+      address 192.196.7.129
+      netmask 255.255.255.248
+
+auto eth1
+iface eth1 inet static
+      address 192.196.7.1
+      netmask 255.255.255.128
+
+auto eth2
+iface eth2 inet static
+      address 192.196.0.1
+      netmask 255.255.252.0
+
+auto eth3
+iface eth3 inet static
+      address 192.196.7.146
+      netmask 255.255.255.252
+      gateway 192.196.7.145
+```
+
+Strix
+```
+auto lo
+iface lo inet loopback
+
+auto eth1
+iface eth1 inet dhcp
+
+auto eth0
+iface eth0 inet static
+address 192.196.7.145
+netmask 255.255.255.252
+
+auto eth2
+iface eth2 inet static
+address 192.196.7.149
+netmask 255.255.255.252
+```
+
+Blackbell
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+```
+
+Briar
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+```
+
+Desmond
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+```
+
+Forger
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+```
+
+Garden
+```
+auto eth0
+iface eth0 inet static
+      address 192.196.7.143
+      netmask 255.255.255.248
+      gateway 192.196.7.141
+```
+
+Eden
+```
+auto eth0
+iface eth0 inet static
+      address 192.196.7.131
+      netmask 255.255.255.248
+      gateway 192.196.7.129
+```
+
+SSS
+```
+auto eth0
+iface eth0 inet static
+      address 192.196.7.142
+      netmask 255.255.255.248
+      gateway 192.196.7.141
+```
+
+WISE
+```
+auto eth0
+iface eth0 inet static
+      address 192.196.7.130
+      netmask 255.255.255.248
+      gateway 192.196.7.129
+```
