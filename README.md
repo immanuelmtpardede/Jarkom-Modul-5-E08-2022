@@ -358,6 +358,10 @@ iptables -t nat -A POSTROUTING -s 192.196.0.0/21 -o eth1 -j SNAT --to-source 192
 cat /etc/resolv.conf
 ping google.com
 ```
+Penjelasan 
+
+NAT Table pada POSTROUTING chain untuk mengubah source address yang awalnya berupa private IPv4 address yang memiliki 16-bit blok dari private IP addresses yaitu 192.196.0.0/21 menjadi IP eth1 Foosha 192.168.122.241
+
 
 2. Kalian diminta untuk melakukan drop semua TCP dan UDP dari luar Topologi kalian pada server yang merupakan DHCP Server demi menjaga keamanan.
 
@@ -366,6 +370,10 @@ Strix
 iptables -A FORWARD -d 192.196.7.130 -i eth0 -p tcp -j DROP
 iptables -A FORWARD -d 192.196.7.130 -i eth0 -p udp -j DROP
 ```
+Penjelasan
+
+Menggunakan FORWARD chain untuk menyaring paket dengan protokol TCP dan UDP dari luar topologi menuju ke DHCP Server yang berada di satu subnet yang sama yaitu 192.196.7.128/29 (A1), dimana akses HTTP (Port 80) yang masuk ke DHCP Server akan di drop
+
 
 3. Loid meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 2 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.
 
@@ -378,6 +386,11 @@ Eden
 ```
 iptables -A INPUT -p icmp -m connlimit --connlimit-above 2 --connlimit-mask 0 -j DROP
 ```
+
+Penjelasan
+
+Menggunakan INPUT chain untuk menyaring paket dengan protokol ICMP yang masuk agar dibatasi hanya sebatas maksimal 3 koneksi saja menggunakan --connlimit-above 2 kemudian bisa diakses darimana saja menggunakan --connlimit-mask 0, jika lebih dari 2 akan di DROP
+
 
 4. Akses menuju Web Server hanya diperbolehkan disaat jam kerja yaitu Senin sampai Jumat pada pukul 07.00 - 16.00.
 
